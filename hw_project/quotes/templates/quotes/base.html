@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     {% load static %}
-    <link rel="stylesheet" href="{% static 'quotes/style.css' %}" />
     <link rel="stylesheet" href="{% static 'quotes/bootstrap.css' %}" />
+    <link rel="stylesheet" href="{% static 'quotes/main.css' %}" />
     <title>Quotes to Scrape</title>
 </head>
 
@@ -29,12 +29,22 @@
         <div class="row">
             <div class="col-md-8">
                 {% block content %}
-                
+
                 {% endblock%}
                 <nav>
                     <ul class="pager">
+                        <li class="previous">
+                            <a {% if not quotes.has_previous %} aria-disabled="true" class="visually-hidden" {% endif %}
+                                href="{% if quotes.has_previous %} {% url 'quotes:root_paginate' quotes.previous_page_number %} {%else%} # {% endif %}">
+                                <span aria-hidden="true">&larr;</span> Previous
+                            </a>
+                        </li>
+                    
                         <li class="next">
-                            <a href="/page/2/">Next <span aria-hidden="true">&rarr;</span></a>
+                            <a {% if not quotes.has_next %} aria-disabled="true" class="visually-hidden" {% endif %}
+                                href="{% if quotes.has_next %} {% url 'quotes:root_paginate' quotes.next_page_number %} {%else%} # {% endif %}">
+                                Next <span aria-hidden="true">&rarr;</span>
+                            </a>
                         </li>
                     </ul>
                 </nav>
@@ -81,8 +91,7 @@
                 Quotes by: <a href="https://www.goodreads.com/quotes">GoodReads.com</a>
             </p>
             <p class="copyright">
-                Made with <span class='ii777'>❤</span> by <a class='ii777'
-                    href="https://github.com/II-777">II-777</a>
+                Made with <span class='ii777'>❤</span> by <a class='ii777' href="https://github.com/II-777">II-777</a>
             </p>
         </div>
     </footer>

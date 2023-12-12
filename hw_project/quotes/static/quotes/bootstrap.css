@@ -569,12 +569,12 @@ th {
 .glyphicon-ban-circle:before {
   content:"\e090"
 }
-.glyphicon-arrow-left:before {
+/* .glyphicon-arrow-left:before {
   content:"\e091"
 }
 .glyphicon-arrow-right:before {
   content:"\e092"
-}
+} */
 .glyphicon-arrow-up:before {
   content:"\e093"
 }

@@ -1,12 +1,12 @@
 {% extends 'quotes/base.html' %}
-
+{% load extract %}
 {% block content %}
 {% for quote in quotes %}
 <div class="quote" itemscope itemtype="http://schema.org/CreativeWork">
     <span class="text" itemprop="text">
         {{quote.quote}}
     </span>
-    <span>by <small class="author" itemprop="author">{{quote.author}}</small>
+    <span>by <small class="author" itemprop="author">{{quote.author|author}}</small>
         <a href="/author/{{quote.author}}">(about)</a>
     </span>
     <div class="tags">
