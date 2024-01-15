@@ -104,4 +104,103 @@ touch quotes/static/quotes/main.css
 {% endblock %}
 ```
 
+### 3.1 Add database data 
+```bash
+mkdir utils
+touch utils/authors.json
+touch utils/quotes.json
+touch utils/add_quotes_to_mongo.py
+touch quotes/utils.py
+```
 
+```python
+# quotes/utils.py
+from pymongo import MongoClient
+
+
+def get_mongodb():
+    client = MongoClient("mongodb://localhost")
+    db = client.hw
+    return db
+```
+
+```python
+# quotes/views.py
+...
+from .utils import get_mongodb
+
+
+def main(request):
+    db = get_mongodb()
+    quotes = db.quotes.find()
+    return render(request, 'quotes/index.html', context={'quotes': quotes})
+```
+
+```python
+# utils/add_quotes_to_mongo.py
+import json
+from bson.objectid import ObjectId
+from pymongo import MongoClient
+
+# Connect to the MongoDB server running on localhost
+client = MongoClient("mongodb://localhost")
+
+# Select the "hw" database
+db = client.hw
+
+# Open the 'quotes.json' file in read mode with UTF-8 encoding
+with open('quotes.json', 'r', encoding='utf-8') as file:
+    # Load the JSON data from the file into the 'quotes' variable
+    quotes = json.load(file)
+
+# Iterate through each quote in the loaded JSON data
+for quote in quotes:
+    # Query the 'authors' collection to find an author with the specified full name
+    author = db.authors.find_one({'fullname': quote['author']})
+
+    # Check if an author is found
+    if author:
+        # Insert a new document into the 'quotes' collection with quote text, tags, and a reference to the author
+        db.quotes.insert_one({
+            'quote': quote['quote'],
+            'tags': quote['tags'],
+            'author': ObjectId(author['_id'])
+        })
+```
+
+### 3.2 Add database data 
+```bash
+mkdir quotes/templatetags
+touch quotes/templatetags/extract.py
+```
+
+### fix author name display 
+```python
+# quote/templatetags/extract.py
+from django import template
+from bson.objectid import ObjectId
+from ..utils import get_mongodb
+
+register = template.Library()
+
+
+def get_author(id_):
+    db = get_mongodb()
+    author = db.authors.find_one({'_id': ObjectId(id_)})
+    if author:
+        return author.get('fullname', 'Unknown')
+    else:
+        return 'Unknown'
+
+register.filter('author', get_author)
+```
+
+### utilize {% load extract %} and {{quote.author|author}} constructs in the index.html
+```html
+<!-- # quotes/index.html -->
+{% extends 'quotes/base.html' %}
+{% load extract %}
+...
+<span>by <small class="author" itemprop="author">{{quote.author|author}}</small>
+...
+```
