@@ -204,3 +204,109 @@ register.filter('author', get_author)
 <span>by <small class="author" itemprop="author">{{quote.author|author}}</small>
 ...
 ```
+
+### 4. Pagination
+- [link django docs: pagination](https://docs.djangoproject.com/en/5.0/topics/pagination/)
+
+### Add routes for the paginated quotes
+```python
+# quotes/urls.py
+...
+urlpatterns = [
+    ...
+    path("<int:page>", views.main, name="root_paginate"),
+]
+```
+
+### Add pagination logic in views.py
+```python
+# quotes/vies.py
+from django.shortcuts import render
+from django.core.paginator import Paginator
+from .utils import get_mongodb
+
+def main(request, page=1):
+    db = get_mongodb()
+    quotes = db.quotes.find()
+    page = int(page)
+    page = max(page, 1)
+    per_page = 10
+    paginator = Paginator(list(quotes), per_page)
+    quotes_on_page = paginator.page(page)
+    return render(request, 'quotes/index.html', context={'quotes': quotes_on_page})
+```
+
+### Add if-statements in the quotes/index.html based on the pagination, e.g:
+```html
+...
+<li class="previous{% if not quotes.has_previous %} visually-hidden{% endif %}">
+...
+```
+
+### 5. MongoDB to Postgres migration
+- [link django docs: querysets](https://docs.djangoproject.com/en/5.0/ref/models/querysets/)
+
+
+### add quotes/models.py file:
+```python
+# quotes/models.py
+from django.db import models
+
+class Author(models.Model):
+    fullname = models.CharField(max_length=50)
+    born_date = models.CharField(max_length=50)
+    born_location = models.CharField(max_length=150)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+def __str__(self):
+        return self.fullname
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50, null = False, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class Quote(models.Model):
+    quote =models.TextField()
+    tags = models.ManyToManyField(Tag)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, default=None, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+```
+
+### create utils/migration.py 
+```python
+# utils/migration.py
+import os
+import django
+from pymongo import MongoClient
+import sys
+
+# Add the project directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'base.settings')
+django.setup()
+
+from quotes.models import Author  # noqa
+
+client = MongoClient("mongodb://localhost")
+db = client.hw
+
+authors = db.authors.find()
+
+for author in authors:
+    Author.objects.get_or_create(
+        fullname=author['fullname'],
+        born_date=author['born_date'],
+        born_location=author['born_location'],
+        description=author['description']
+    )
+```
+
+### Execute utils/migration.py as a module
+```bash
+# utils/migration.py
+py -m utils.migration
+```

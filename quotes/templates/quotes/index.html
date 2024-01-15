@@ -20,11 +20,23 @@
         {% endfor %}
         <nav>
             <ul class="pager">
-                <li class="next">
-                    <a href="/page/1/">Next <span aria-hidden="true">&rarr;</span></a>
+                <li class="previous{% if not quotes.has_previous %} visually-hidden{% endif %}">
+                    <a class="{% if not quotes.has_previous %} disabled {% endif %}"
+                        href="{% if quotes.has_previous %} {% url 'quotes:root_paginate' quotes.previous_page_number %} {% else %} # {% endif %}">
+                        <span aria-hidden="true">&larr;</span>
+                        Previous 
+                    </a>
+                </li>
+                <li class="next{% if not quotes.has_next %} visually-hidden{% endif %}">
+                    <a class="{% if not quotes.has_next %} disabled {% endif %}"
+                        href="{% if quotes.has_next %} {% url 'quotes:root_paginate' quotes.next_page_number %} {% else %} # {% endif %}">
+                        Next 
+                        <span aria-hidden="true">&rarr;</span>
+                    </a>
                 </li>
             </ul>
         </nav>
+
     </div>
     <div class="col-md-4 tags-box">
         <h2>Top Ten tags</h2>
