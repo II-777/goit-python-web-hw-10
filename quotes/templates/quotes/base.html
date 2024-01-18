@@ -3,13 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
     {% load static %}
-
-    <link rel="stylesheet" href="{% static 'quotes/style.css' %}" />
-
-    <title>Homework - copy "Quotes to scrape"</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'quotes/bootstrap.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'quotes/main.css' %}" />
+    <title>Quotes To Scrape"</title>
   </head>
   <body>
     <div class="container">
@@ -19,14 +17,16 @@
         </div>
         <div class="col-md-4">
           <p>
-            {% if user.is_authenticated %}
+            <a style="padding-left: 10px;" href="#">Login</a>
+            <a style="padding-left: 10px;" href="#">Register</a>
+            {% comment %} {% if user.is_authenticated %}
               <a href="{% url 'users:logout' %}">Logout</a>
               <a href="{% url 'quotes:author_add' %}">Add Author</a>
               <a href="{% url 'quotes:quote_add' %}">Add Quote</a>
             {% else %}
               <a href="{% url 'users:login' %}">Login</a>
               <a href="{% url 'users:register' %}">Register</a>
-            {% endif %}
+            {% endif %} {% endcomment %}
           </p>
         </div>
       </div>
@@ -35,7 +35,6 @@
 
       {% endblock %}
     </div>
-
     <footer class="footer">
       <div class="container">
         <p class="text-muted">

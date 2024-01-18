@@ -1,6 +1,7 @@
 /* Custom page CSS */
 body {
   font-family: sans-serif;
+  padding-bottom: 30px;
 }
 
 .container .text-muted {
